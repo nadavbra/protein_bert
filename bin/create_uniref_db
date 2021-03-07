@@ -1,0 +1,32 @@
+#! /usr/bin/env python3
+
+import os
+import argparse
+
+import pandas as pd
+
+from proteinbert.shared_utils.util import get_parser_file_type
+from proteinbert.uniref_dataset import UnirefToSqliteParser, parse_go_annotations_meta
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description = 'Create an sqlite DB from a raw UniRef file.')
+    parser.add_argument('--uniref-xml-gz-file', dest = 'uniref_xml_gz_file', metavar = '/path/to/unirefXX.xml.gz', type = get_parser_file_type(parser, must_exist = True), \
+            required = True, help = 'Path to the raw UniRef file.')
+    parser.add_argument('--go-annotations-meta-file', dest = 'go_annotations_meta_file', metavar = '/path/to/go.txt', type = get_parser_file_type(parser, must_exist = True), \
+            required = True, help = 'Path to the specification file of all possible GO annotations (from CAFA).')
+    parser.add_argument('--output-sqlite-file', dest = 'output_sqlite_file', metavar = '/path/to/uniref.db', type = get_parser_file_type(parser), \
+            required = True, help = 'Path to the save the output sqlite file.')
+    parser.add_argument('--output-go-annotations-meta-csv-file', dest = 'output_go_annotations_meta_csv_file', metavar = '/path/to/go_annotations.csv', \
+            type = get_parser_file_type(parser), required = True, help = 'Path to the save the output CSV file with metadata for all the GO annotations.')
+    parser.add_argument('--log-progress-every', dest = 'log_progress_every', metavar = '1000', type = int, default = 1000, help = 'If running in verbose (non-silent) mode, ' + \
+            'log the progress of the process in increments of this given number (1000 by default).')
+    parser.add_argument('--chunk-size', dest = 'chunk_size', metavar = '100000', type = int, default = 100000, help = 'The number of protein records per chunk written ' + \
+            'into the created DB.')
+    parser.add_argument('--silent', dest = 'silent', action = 'store_true', help = 'Run in silent mode.')
+    args = parser.parse_args()
+    
+    go_annotations_meta = parse_go_annotations_meta(args.go_annotations_meta_file)
+    UnirefToSqliteParser(args.uniref_xml_gz_file, go_annotations_meta, args.output_sqlite_file, verbose = not args.silent, log_progress_every = args.log_progress_every, \
+            chunk_size = args.chunk_size).parse()
+    go_annotations_meta.to_csv(args.output_go_annotations_meta_csv_file)

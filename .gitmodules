@@ -1,0 +1,3 @@
+[submodule "proteinbert/shared_utils"]
+	path = proteinbert/shared_utils
+	url = https://github.com/nadavbra/shared_utils.git
