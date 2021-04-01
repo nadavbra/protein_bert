@@ -4,6 +4,7 @@ import numpy as np
 
 from tensorflow import keras
 
+from .shared_utils.util import log
 from .tokenization import additional_token_to_index, n_tokens, tokenize_seq
     
 class ModelGenerator:
@@ -18,7 +19,7 @@ class ModelGenerator:
     def train(self, encoded_train_set, encoded_valid_set, seq_len, batch_size, n_epochs, lr = None, callbacks = [], **create_model_kwargs):
     
         train_X, train_Y, train_sample_weigths = encoded_train_set
-        self.dummy_epoch = (train_X[:1], train_Y[:1])
+        self.dummy_epoch = (_slice_arrays(train_X, slice(0, 1)), _slice_arrays(train_Y, slice(0, 1)))
         model = self.create_model(seq_len, **create_model_kwargs)
         
         if lr is not None:
@@ -43,7 +44,10 @@ class ModelGenerator:
             model.set_weights(self.model_weights)
         
         if self.optimizer_weights is not None:
-            model.optimizer.set_weights(self.optimizer_weights)
+            if len(self.optimizer_weights) == len(model.optimizer.get_weights()):
+                model.optimizer.set_weights(self.optimizer_weights)
+            else:
+                log('Incompatible number of optimizer weights - will not initialize them.')
             
     def _train_for_a_dummy_epoch(self, model):
         X, Y = self.dummy_epoch
@@ -104,8 +108,8 @@ class FinetuningModelGenerator(ModelGenerator):
         
         model = self.pretraining_model_generator.create_model(seq_len, compile = False)
             
-        if pretraining_model_manipulation_function is not None:
-            model = pretraining_model_manipulation_function(model)
+        if self.pretraining_model_manipulation_function is not None:
+            model = self.pretraining_model_manipulation_function(model)
             
         if freeze_pretrained_layers:
             for layer in model.layers:
@@ -180,3 +184,9 @@ def tokenize_seqs(seqs, seq_len):
 def clear_session():
     import tensorflow.keras.backend as K
     K.clear_session()
+    
+def _slice_arrays(arrays, slicing):
+    if isinstance(arrays, list) or isinstance(arrays, tuple):
+        return [array[slicing] for array in arrays]
+    else:
+        return arrays[slicing]

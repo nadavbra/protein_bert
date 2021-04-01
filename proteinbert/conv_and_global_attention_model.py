@@ -130,3 +130,19 @@ def create_model(seq_len, vocab_size, n_annotations, d_hidden_seq = 128, d_hidde
     output_annotations = keras.layers.Dense(n_annotations, activation = 'sigmoid', name = 'output-annotations')(hidden_global)
 
     return keras.models.Model(inputs = [input_seq, input_annoatations], outputs = [output_seq, output_annotations])
+    
+def get_model_with_hidden_layers_as_outputs(model):
+    
+    _, seq_len, _ = model.outputs[0].shape
+    
+    seq_layers = [layer.output for layer in model.layers if len(layer.output.shape) == 3 and \
+            tuple(layer.output.shape)[:2] == (None, seq_len) and (layer.name in ['input-seq-encoding', 'dense-seq-input', 'output-seq'] or \
+            isinstance(layer, keras.layers.LayerNormalization))]
+    global_layers = [layer.output for layer in model.layers if len(layer.output.shape) == 2 and (layer.name in ['input_annoatations', \
+            'dense-global-input', 'output-annotations'] or isinstance(layer, keras.layers.LayerNormalization))]
+    
+    concatenated_seq_output = keras.layers.Concatenate(name = 'all-seq-layers')(seq_layers)
+    concatenated_global_output = keras.layers.Concatenate(name = 'all-global-layers')(global_layers)
+    
+    return keras.models.Model(inputs = model.inputs, outputs = [concatenated_seq_output, concatenated_global_output])
+    

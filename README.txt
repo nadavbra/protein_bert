@@ -16,24 +16,20 @@
 
 > nohup ~/github_projects/protein_bert/bin/create_uniref_db --uniref-xml-gz-file=./uniref90.xml.gz --go-annotations-meta-file=./cafa4ontologies/go.txt --output-sqlite-file=./uniref_proteins_and_annotations.db --output-go-annotations-meta-csv-file=./go_annotations.csv >&! ./log_create_uniref_db.txt &
 
-> nohup ~/github_projects/protein_bert/bin/create_uniref_h5_dataset --protein-annotations-sqlite-db-file=./uniref_proteins_and_annotations.db --protein-fasta-file=./uniref90.fasta --go-annotations-meta-csv-file=./go_annotations.csv --output-h5-dataset-file=./dataset.h5 --min-records-to-keep-annotation=100 >&! ./log_create_uniref_h5_dataset.txt & ######## I AM HERE ########
+> nohup ~/github_projects/protein_bert/bin/create_uniref_h5_dataset --protein-annotations-sqlite-db-file=./uniref_proteins_and_annotations.db --protein-fasta-file=./uniref90.fasta --go-annotations-meta-csv-file=./go_annotations.csv --output-h5-dataset-file=./dataset.h5 --min-records-to-keep-annotation=100 >&! ./log_create_uniref_h5_dataset.txt
 
-> ~/github_projects/protein_bert/bin/set_h5_testset --h5-dataset-file=./dataset.h5 --uniprot-ids-file=~/tmp/new_proteinbert_dataset/uniref_90_seqs_matching_test_set_seqs.txt
+> ~/github_projects/protein_bert/bin/set_h5_testset --h5-dataset-file=./dataset.h5 --uniprot-ids-file=./uniref_90_seqs_matching_test_set_seqs.txt
 
 
 ### Pretrain the model ###
 
-> cd ~/tmp/new_proteinbert_model
 > module load cuda/11.0
 > module load cudnn/8.0.2
-> ~/github_projects/protein_bert/bin/pretrain_proteinbert --dataset-file=/cs/phd/nadavb/tmp/new_proteinbert_dataset/original_dataset.h5 --autosave-dir=. --resume-from=./epoch_92400_sample_23500000.pkl
+> nohup ~/github_projects/protein_bert/bin/pretrain_proteinbert --dataset-file=~/tmp/new_proteinbert_dataset/dataset.h5 --autosave-dir=~/proteinbert_models/new >&! ~/proteinbert_models/log_new_pretraining.txt &
+
+# --resume-from=.../epoch_92400_sample_23500000.pkl
 
 
 # Dependencies:
 
 tensorflow_addons
-
-
-# TODO:
-Updated 'included_annotations' in original_dataset.h5 (see the format in the new dataset.h5 once it's ready) and put it on FTP
-

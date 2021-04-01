@@ -35,7 +35,7 @@ if __name__ == '__main__':
     np.random.seed(0)
 
     with h5py.File(args.h5_dataset_file, 'a') as h5f:
-        uniprot_ids = h5f['uniprot_ids'][:]
+        uniprot_ids = [uniprot_id.decode('utf-8') for uniprot_id in h5f['uniprot_ids']]
         test_set_mask = np.array([uniprot_id in test_set_uniprot_ids for uniprot_id in uniprot_ids]) | np.random.choice([True, False], len(uniprot_ids), \
                 p = [args.set_with_prob, 1 - args.set_with_prob])
         h5f.create_dataset('test_set_mask', data = test_set_mask, dtype = bool)

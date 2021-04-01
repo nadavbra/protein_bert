@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from .shared_utils.util import log
 from .tokenization import ADDED_TOKENS_PER_SEQ
 
 class OutputType:
@@ -61,8 +62,12 @@ def finetune(model_generator, input_encoder, output_spec, train_seqs, train_raw_
         encoded_train_set, encoded_valid_set = encode_train_and_valid_sets(train_seqs, train_raw_Y, valid_seqs, valid_raw_Y, input_encoder, output_spec, final_seq_len)
         model_generator.train(encoded_train_set, encoded_valid_set, final_seq_len, final_batch_size, n_final_epochs, lr = final_lr, callbacks = callbacks, \
                 freeze_pretrained_layers = False)
+                
+    model_generator.optimizer_weights = None
 
 def evaluate_by_len(model_generator, input_encoder, output_spec, seqs, raw_Y, start_seq_len = 512, start_batch_size = 32, increase_factor = 2):
+    
+    assert model_generator.optimizer_weights is None
     
     dataset = pd.DataFrame({'seq': seqs, 'raw_y': raw_Y})
         
@@ -72,9 +77,9 @@ def evaluate_by_len(model_generator, input_encoder, output_spec, seqs, raw_Y, st
     y_preds = []
     
     for len_matching_dataset, seq_len, batch_size in split_dataset_by_len(dataset, start_seq_len = start_seq_len, start_batch_size = start_batch_size, \
-            increase_factor = increase_factor)
+            increase_factor = increase_factor):
 
-        X, y_true, sample_weigths = encode_dataset(len_matching_dataset['seq'], len_matching_dataset['raw_y'], input_encoder, output_spec, \
+        X, y_true, sample_weights = encode_dataset(len_matching_dataset['seq'], len_matching_dataset['raw_y'], input_encoder, output_spec, \
                 seq_len = seq_len, needs_filtering = False)
         
         assert set(np.unique(sample_weights)) <= {0.0, 1.0}
@@ -91,7 +96,7 @@ def evaluate_by_len(model_generator, input_encoder, output_spec, seqs, raw_Y, st
         else:
             y_pred = y_pred.flatten()
         
-        results.append(get_evaluation_results(y_pred, y_true, output_spec))
+        results.append(get_evaluation_results(y_true, y_pred, output_spec))
         results_names.append(seq_len)
         
         y_trues.append(y_true)
@@ -99,7 +104,7 @@ def evaluate_by_len(model_generator, input_encoder, output_spec, seqs, raw_Y, st
         
     y_true = np.concatenate(y_trues, axis = 0)
     y_pred = np.concatenate(y_preds, axis = 0)
-    all_results, confusion_matrix = evaluate_chunk(y_pred, y_true, output_spec, return_confusion_matrix = True)
+    all_results, confusion_matrix = get_evaluation_results(y_true, y_pred, output_spec, return_confusion_matrix = True)
     results.append(all_results)
     results_names.append('All')
     
