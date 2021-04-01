@@ -8,6 +8,7 @@ TODO
 =============
 
 * Update ProteinBERT demo.ipynb
+    - Make the benchmark files accessible through FTP
 * Create setup.py and pip install
 * Write a proper documentation (including installation instructions and dependencies, usage, some background about the package, and how to cite it).
     - Notice that the dependencies include tensorflow_addons
