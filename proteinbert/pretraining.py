@@ -10,7 +10,7 @@ import h5py
 from tensorflow import keras
 
 from .shared_utils.util import log
-from .tokenization import ADDED_TOKENS_PER_SEQ, additional_token_to_index, n_tokens, tokenize_seq
+from .tokenization import ADDED_TOKENS_PER_SEQ, additional_token_to_index, n_tokens, tokenize_seq, parse_seq
 from .model_generation import PretrainingModelGenerator
 
 DEFAULT_EPISODE_SETTINGS = [
@@ -280,7 +280,7 @@ class DatasetHandler:
         self.total_size = len(dataset_h5f['seq_lengths'])
         
     def __getitem__(self, slicing):
-        return SampleCache(self.dataset_h5f['seqs'][slicing], self.dataset_h5f['annotation_masks'][slicing], \
+        return SampleCache(list(map(parse_seq, self.dataset_h5f['seqs'][slicing])), self.dataset_h5f['annotation_masks'][slicing], \
                 self.dataset_h5f['test_set_mask'][slicing])
 
 class SampleCache:

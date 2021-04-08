@@ -10,7 +10,7 @@ import h5py
 from lxml import etree
 from pyfaidx import Faidx
 
-from .shared_utils.util import log
+from .shared_utils.util import log, to_chunks
 
 class UnirefToSqliteParser:
 
@@ -177,14 +177,15 @@ def parse_go_annotations_meta(meta_file_path):
     return go_annotations_meta
     
 def create_h5_dataset(protein_annotations_sqlite_db_file_path, fasta_file_path, go_annotations_meta_csv_file_path, output_h5_file_path, shuffle = True, \
-        min_records_to_keep_annotation = 100, records_limit = None, verbose = True, log_progress_every = 10000):
+        min_records_to_keep_annotation = 100, records_limit = None, save_chunk_size = 10000, verbose = True, log_progress_every = 10000):
     
-    annotation_counts = pd.read_csv(go_annotations_meta_csv_file_path, usecols = ['id', 'count'], index_col = 0, squeeze = True)
-    common_annotations = np.array(sorted(annotation_counts[annotation_counts >= min_records_to_keep_annotation].index))
-    common_annotation_to_index = {annotation: i for i, annotation in enumerate(common_annotations)}
+    go_annotations_meta = pd.read_csv(go_annotations_meta_csv_file_path, usecols = ['id', 'index', 'count'], index_col = 0)
+    annotation_counts = go_annotations_meta['count']
+    common_annotation_ids = np.array(sorted(annotation_counts[annotation_counts >= min_records_to_keep_annotation].index))
+    original_annotation_index_to_common_annotation_index = {go_annotations_meta.loc[annotation_id, 'index']: i for i, annotation_id in enumerate(common_annotation_ids)}
     
     if verbose:
-        log('Will encode the %d most common annotations.' % len(common_annotations))
+        log('Will encode the %d most common annotations.' % len(common_annotation_ids))
         
     n_seqs = sum(1 for _ in load_seqs_and_annotations(protein_annotations_sqlite_db_file_path, fasta_file_path, shuffle = False, records_limit = records_limit, \
             verbose = verbose, log_progress_every = log_progress_every))
@@ -194,19 +195,26 @@ def create_h5_dataset(protein_annotations_sqlite_db_file_path, fasta_file_path, 
 
     with h5py.File(output_h5_file_path, 'w') as h5f:
         
-        h5f.create_dataset('included_annotations', data = [annotation.encode('ascii') for annotation in common_annotations], dtype = h5py.string_dtype())
+        h5f.create_dataset('included_annotations', data = [annotation.encode('ascii') for annotation in common_annotation_ids], dtype = h5py.string_dtype())
         uniprot_ids = h5f.create_dataset('uniprot_ids', shape = (n_seqs,), dtype = h5py.string_dtype())
         seqs = h5f.create_dataset('seqs', shape = (n_seqs,), dtype = h5py.string_dtype())
         seq_lengths = h5f.create_dataset('seq_lengths', shape = (n_seqs,), dtype = np.int32)
-        annotation_masks = h5f.create_dataset('annotation_masks', shape = (n_seqs, len(common_annotations)), dtype = bool)
+        annotation_masks = h5f.create_dataset('annotation_masks', shape = (n_seqs, len(common_annotation_ids)), dtype = bool)
         
-        for i, (uniprot_id, seq, annotations) in enumerate(load_seqs_and_annotations(protein_annotations_sqlite_db_file_path, fasta_file_path, shuffle = shuffle, \
-                records_limit = records_limit, verbose = verbose, log_progress_every = log_progress_every)):
+        start_index = 0
+        
+        for seqs_and_annotations_chunk in to_chunks(load_seqs_and_annotations(protein_annotations_sqlite_db_file_path, fasta_file_path, shuffle = shuffle, \
+                records_limit = records_limit, verbose = verbose, log_progress_every = log_progress_every), save_chunk_size):
             
-            uniprot_ids[i] = uniprot_id
-            seqs[i] = seq
-            seq_lengths[i] = len(seq)
-            annotation_masks[i, :] = _encode_annotations(annotations, common_annotation_to_index)
+            end_index = start_index + len(seqs_and_annotations_chunk)
+            uniprot_id_chunk, seq_chunk, annotation_indices_chunk = map(list, zip(*seqs_and_annotations_chunk))
+            
+            uniprot_ids[start_index:end_index] = uniprot_id_chunk
+            seqs[start_index:end_index] = seq_chunk
+            seq_lengths[start_index:end_index] = list(map(len, seq_chunk))
+            annotation_masks[start_index:end_index, :] = _encode_annotations_as_a_binary_matrix(annotation_indices_chunk, original_annotation_index_to_common_annotation_index)
+            
+            start_index = end_index
              
     if verbose:
         log('Done.')
@@ -237,7 +245,7 @@ def load_seqs_and_annotations(protein_annotations_sqlite_db_file_path, fasta_fil
     
     n_failed = 0
 
-    for i, (uniprot_id, raw_annotations) in raw_proteins_and_annotations[['uniprot_name', 'complete_go_annotation_indices']].iterrows():
+    for i, (_, (uniprot_id, raw_go_annotation_indices)) in enumerate(raw_proteins_and_annotations.iterrows()):
         
         if verbose and i % log_progress_every == 0:
             log('%d/%d' % (i, len(raw_proteins_and_annotations)), end = '\r')
@@ -246,7 +254,7 @@ def load_seqs_and_annotations(protein_annotations_sqlite_db_file_path, fasta_fil
         
         try:
             seq = str(seqs_faidx.fetch(seq_fasta_id, 1, seqs_faidx.index[seq_fasta_id].rlen))
-            yield uniprot_id, seq, json.loads(raw_annotations)
+            yield uniprot_id, seq, json.loads(raw_go_annotation_indices)
         except KeyError:
             n_failed += 1
             
@@ -291,15 +299,16 @@ def _get_index_to_all_ancestors(index_to_direct_children, root_indices):
         
     return index_to_all_ancestors
     
-def _encode_annotations(annotations, common_annotation_to_index):
+def _encode_annotations_as_a_binary_matrix(records_annotations, annotation_to_index):
     
-    annotation_mask = np.zeros(len(common_annotation_to_index), dtype = bool)
+    annotation_masks = np.zeros((len(records_annotations), len(annotation_to_index)), dtype = bool)
     
-    for annotation in annotations:
-        if annotation in common_annotation_to_index:
-            annotation_mask[common_annotation_to_index[annotation]] = True
+    for i, record_annotations in enumerate(records_annotations):
+        for annotation in record_annotations:
+            if annotation in annotation_to_index:
+                annotation_masks[i, annotation_to_index[annotation]] = True
             
-    return annotation_mask
+    return annotation_masks
         
 def _etree_fast_iter(context, func, func_args = [], func_kwargs = {}, max_elements = None):
     '''

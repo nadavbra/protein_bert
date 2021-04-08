@@ -13,5 +13,13 @@ n_tokens = len(token_to_index)
 
 def tokenize_seq(seq):
     other_token_index = additional_token_to_index['<OTHER>']
-    return [additional_token_to_index['<START>']] + [aa_to_token_index.get(aa, other_token_index) for aa in seq] + \
+    return [additional_token_to_index['<START>']] + [aa_to_token_index.get(aa, other_token_index) for aa in parse_seq(seq)] + \
             [additional_token_to_index['<END>']]
+            
+def parse_seq(seq):
+    if isinstance(seq, str):
+        return seq
+    elif isinstance(seq, bytes):
+        return seq.decode('utf8')
+    else:
+        raise TypeError('Unexpected sequence type: %s' % type(seq))

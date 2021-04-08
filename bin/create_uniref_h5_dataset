@@ -22,11 +22,12 @@ if __name__ == '__main__':
             'log the progress of the process in increments of this given number (10000 by default).')
     parser.add_argument('--records-limit', dest = 'records_limit', metavar = 'n', type = int, default = None, help = 'Limit the number of loaded records. By default will ' + \
             'load all records')
+    parser.add_argument('--save-chunk-size', dest = 'save_chunk_size', metavar = '10000', type = int, default = 10000, help = 'The number of records to save per chunk.')
     parser.add_argument('--no-shuffle', dest = 'no_shuffle', action = 'store_true', help = 'By default, records are shuffled (to ensure a heterogenous dataset that trains ' + \
             'better). Provide this flag to disable that.')
     parser.add_argument('--silent', dest = 'silent', action = 'store_true', help = 'Run in silent mode.')
     args = parser.parse_args()
     
     create_h5_dataset(args.protein_annotations_sqlite_db_file, args.protein_fasta_file, args.go_annotations_meta_csv_file, args.output_h5_dataset_file, shuffle = \
-            not args.no_shuffle, min_records_to_keep_annotation = args.min_records_to_keep_annotation, records_limit = args.records_limit, verbose = not args.silent, \
-            log_progress_every = args.log_progress_every)
+            not args.no_shuffle, min_records_to_keep_annotation = args.min_records_to_keep_annotation, records_limit = args.records_limit, save_chunk_size = args.save_chunk_size, \
+            verbose = not args.silent, log_progress_every = args.log_progress_every)
