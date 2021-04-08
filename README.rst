@@ -46,6 +46,9 @@ XXX Pretraining the model
 >>> setenv PYTHONPATH ~/github_projects/protein_bert
 >>> module load cuda/11.0
 >>> module load cudnn/8.0.2
+
+>>> nohup ~/github_projects/protein_bert/bin/pretrain_proteinbert --dataset-file=/cs/phd/nadavb/proteinbert_project/data/original_dataset.h5 --autosave-dir=~/proteinbert_models/continue_original --resume-from=~/proteinbert_models/original_dumps/epoch_92400_sample_23500000.pkl >&! ~/proteinbert_models/log_new_pretraining_continuing_original_1.txt &
+
 >>> nohup ~/github_projects/protein_bert/bin/pretrain_proteinbert --dataset-file=~/tmp/new_proteinbert_dataset/dataset.h5 --autosave-dir=~/proteinbert_models/new >&! ~/proteinbert_models/log_new_pretraining.txt &
 
 >>> # --resume-from=.../epoch_92400_sample_23500000.pkl
