@@ -49,6 +49,58 @@ Using ProteinBERT
 Fine-tuning ProteinBERT is very easy. You can see some working examples `in this notebook <https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb>`_.
     
     
+Pretraining ProteinBERT from scratch
+=============
+
+If, instead of using the existing pretrained model weights, you would like to train it from scratch, then follow the steps below. We warn you however that this is a long process (we pretrained the current model for a whole month), and it also requires a lot of storage (>1TB).
+
+Step 1: Create the UniRef dataset
+------------
+
+ProteinBERT is pretrained on a dataset derived from UniRef90. Follow these steps to produce this dataset:
+
+1. First, choose a working directory with sufficient (>1TB) free storage.
+
+.. code-block:: sh
+    
+    cd /some/workdir
+
+2. Download the metadata of GO from CAFA and extract it.
+
+.. code-block:: sh
+
+    wget https://www.biofunctionprediction.org/cafa-targets/cafa4ontologies.zip
+    mkdir cafa4ontologies
+    unzip cafa4ontologies.zip -d cafa4ontologies/
+    
+3. Download UniRef90, as both XML and FASTA.
+
+.. code-block:: sh
+
+    wget ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.xml.gz
+    wget ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz
+    gunzip uniref90.fasta.gz
+    
+4. Use the *create_uniref_db* script provided by ProteinBERT to extract the GO annotations associated with UniRef's records into an SQLite database (and a CSV file with the metadata of these GO annotations). Since this is a long process (which can take up to a few days), it is recommended to run this in the background (e.g. using *nohup*).
+    
+.. code-block:: sh
+
+    nohup create_uniref_db --uniref-xml-gz-file=./uniref90.xml.gz --go-annotations-meta-file=./cafa4ontologies/go.txt --output-sqlite-file=./uniref_proteins_and_annotations.db --output-go-annotations-meta-csv-file=./go_annotations.csv >&! ./log_create_uniref_db.txt &
+    
+5. Create the final dataset (in the H5 format) by merging the database of GO annotations with the protein sequences using the *create_uniref_h5_dataset* script provided by ProteinBERT. This is also a long process that should be let to run in the background.
+
+.. code-block:: sh
+    
+    nohup create_uniref_h5_dataset --protein-annotations-sqlite-db-file=./uniref_proteins_and_annotations.db --protein-fasta-file=./uniref90.fasta --go-annotations-meta-csv-file=./go_annotations.csv --output-h5-dataset-file=./dataset.h5 --min-records-to-keep-annotation=100 >&! ./log_create_uniref_h5_dataset.txt &
+    
+6. Finally, use ProteinBERT's *set_h5_testset* script to designate which of the dataset records will be considered part of the test set (so that their GO annotations are not used during pretraining). If you are planning to evaluate your model on certain downstream benchmarks, it is recommended that any UniRef record similar to a test-set protein in these benchmark will be considered part of the pretraining's test set. You can use BLAST to find all of these UniRef records and provide them to *set_h5_testset* through the flag ``--uniprot-ids-file=./uniref_90_seqs_matching_test_set_seqs.txt``, where the provided text file contains the UniProt IDs of the relevant records, one per line (e.g. *A0A009EXK6_ACIBA*).
+
+.. code-block:: sh
+
+    set_h5_testset --h5-dataset-file=./dataset.h5
+
+    
+    
 License
 =======
 ProteinBERT is a free open-source project available under the `MIT License <https://en.wikipedia.org/wiki/MIT_License>`_.
