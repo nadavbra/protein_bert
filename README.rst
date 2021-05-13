@@ -41,4 +41,20 @@ Alternatively, clone this repository and run:
 .. code-block:: sh
 
     python setup.py install
+    
+    
+Using ProteinBERT
+=============
 
+Fine-tuning ProteinBERT is very easy. You can see some working examples `in this notebook <https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb>`_.
+    
+    
+License
+=======
+ProteinBERT is a free open-source project available under the `MIT License <https://en.wikipedia.org/wiki/MIT_License>`_.
+ 
+   
+Cite us
+=======
+
+TODO
