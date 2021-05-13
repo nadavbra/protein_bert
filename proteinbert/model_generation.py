@@ -1,3 +1,4 @@
+from numbers import Number
 import pickle
 
 import numpy as np
@@ -30,8 +31,8 @@ class ModelGenerator:
         self.update_state(model)
         
     def update_state(self, model):
-        self.model_weights = model.get_weights()
-        self.optimizer_weights = model.optimizer.get_weights()
+        self.model_weights = copy_weights(model.get_weights())
+        self.optimizer_weights = copy_weights(model.optimizer.get_weights())
         
     def _init_weights(self, model):
     
@@ -41,11 +42,11 @@ class ModelGenerator:
             self._train_for_a_dummy_epoch(model)
             
         if self.model_weights is not None:
-            model.set_weights(self.model_weights)
+            model.set_weights(copy_weights(self.model_weights))
         
         if self.optimizer_weights is not None:
             if len(self.optimizer_weights) == len(model.optimizer.get_weights()):
-                model.optimizer.set_weights(self.optimizer_weights)
+                model.optimizer.set_weights(copy_weights(self.optimizer_weights))
             else:
                 log('Incompatible number of optimizer weights - will not initialize them.')
             
@@ -66,7 +67,7 @@ class PretrainingModelGenerator(ModelGenerator):
         self.create_model_kwargs = create_model_kwargs
         self.annots_loss_weight = annots_loss_weight
         
-    def create_model(self, seq_len, compile = True):
+    def create_model(self, seq_len, compile = True, init_weights = True):
         
         clear_session()
         model = self.create_model_function(seq_len, n_tokens, self.n_annotations, **self.create_model_kwargs)
@@ -75,13 +76,15 @@ class PretrainingModelGenerator(ModelGenerator):
             model.compile(optimizer = self.optimizer_class(lr = self.lr, **self.other_optimizer_kwargs), loss = ['sparse_categorical_crossentropy', 'binary_crossentropy'], \
                     loss_weights = [1, self.annots_loss_weight])
         
-        self._init_weights(model)
+        if init_weights:
+            self._init_weights(model)
+        
         return model
         
 class FinetuningModelGenerator(ModelGenerator):
 
-    def __init__(self, pretraining_model_generator, output_spec, pretraining_model_manipulation_function = None, optimizer_class = None, lr = None, \
-            other_optimizer_kwargs = None, model_weights = None, optimizer_weights = None):
+    def __init__(self, pretraining_model_generator, output_spec, pretraining_model_manipulation_function = None, dropout_rate = 0.5, optimizer_class = None, \
+            lr = None, other_optimizer_kwargs = None, model_weights = None, optimizer_weights = None):
         
         if other_optimizer_kwargs is None:
             if optimizer_class is None:
@@ -101,12 +104,11 @@ class FinetuningModelGenerator(ModelGenerator):
         self.pretraining_model_generator = pretraining_model_generator
         self.output_spec = output_spec
         self.pretraining_model_manipulation_function = pretraining_model_manipulation_function
-        
-        self._discard_pretraining_weights_if_overridden()
+        self.dropout_rate = dropout_rate
                     
     def create_model(self, seq_len, freeze_pretrained_layers = False):
         
-        model = self.pretraining_model_generator.create_model(seq_len, compile = False)
+        model = self.pretraining_model_generator.create_model(seq_len, compile = False, init_weights = (self.model_weights is None))
             
         if self.pretraining_model_manipulation_function is not None:
             model = self.pretraining_model_manipulation_function(model)
@@ -118,6 +120,7 @@ class FinetuningModelGenerator(ModelGenerator):
         model_inputs = model.input
         pretraining_output_seq_layer, pretraining_output_annoatations_layer = model.output
         last_hidden_layer = pretraining_output_seq_layer if self.output_spec.output_type.is_seq else pretraining_output_annoatations_layer
+        last_hidden_layer = keras.layers.Dropout(self.dropout_rate)(last_hidden_layer)
         
         if self.output_spec.output_type.is_categorical:
             output_layer = keras.layers.Dense(len(self.output_spec.unique_labels), activation = 'softmax')(last_hidden_layer)
@@ -137,20 +140,7 @@ class FinetuningModelGenerator(ModelGenerator):
         self._init_weights(model)
                 
         return model
-        
-    def update_state(self, model):
-        ModelGenerator.update_state(self, model)
-        self._discard_pretraining_weights_if_overridden()
-        
-    def _discard_pretraining_weights_if_overridden(self):
-        if self.model_weights is not None:
-            self.pretraining_model_generator.model_weights = None
-            self.pretraining_model_generator.optimizer_weights = None
-            self.pretraining_model_generator.dummy_epoch = None
-        elif self.optimizer_weights is not None:
-            self.pretraining_model_generator.optimizer_weights = None
-            self.pretraining_model_generator.dummy_epoch = None
-                
+                        
 class InputEncoder:
 
     def __init__(self, n_annotations):
@@ -184,6 +174,17 @@ def tokenize_seqs(seqs, seq_len):
 def clear_session():
     import tensorflow.keras.backend as K
     K.clear_session()
+    
+def copy_weights(weights):
+    return [_copy_number_or_array(w) for w in weights]
+    
+def _copy_number_or_array(variable):
+    if isinstance(variable, np.ndarray):
+        return variable.copy()
+    elif isinstance(variable, Number):
+        return variable
+    else:
+        raise TypeError('Unexpected type %s' % type(variable))
     
 def _slice_arrays(arrays, slicing):
     if isinstance(arrays, list) or isinstance(arrays, tuple):
