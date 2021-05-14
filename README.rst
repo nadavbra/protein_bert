@@ -98,8 +98,35 @@ ProteinBERT is pretrained on a dataset derived from UniRef90. Follow these steps
 .. code-block:: sh
 
     set_h5_testset --h5-dataset-file=./dataset.h5
-
     
+    
+Step 2: Pretrain ProteinBERT on the UniRef dataset
+------------
+
+Once you have the dataset ready, the *pretrain_proteinbert* script will train a ProteinBERT model on that dataset.
+
+Basic use of the pretraining script looks as follows:
+
+.. code-block:: sh
+
+    mkdir -p ~/proteinbert_models/new
+    nohup pretrain_proteinbert --dataset-file=./dataset.h5 --autosave-dir=~/proteinbert_models/new >&! ~/proteinbert_models/log_new_pretraining.txt &
+    
+By running that, ProteinBERT will continue to train indefinitely. Therefore, make sure to run it in the background using *nohup* or other options. Every given number of epochs (determined as 100 batches) the model state will be automatically saved into the specified autosave directory. If this process is interrupted and you wish to resume pretraining
+from a given snapshot (e.g. the most up-to-date state file within the autosave dir) use the ``--resume-from`` flag (provide it the state file that you wish to resume from).
+
+*pretrain_proteinbert* has MANY options and hyper-parameters that are worth checking out:
+
+.. code-block:: sh
+
+    pretrain_proteinbert --help
+    
+    
+Step 3: Use your pretrained model state when fine-tuning ProteinBERT
+------------
+
+Normally the function *load_pretrained_model* is used to load the existing pretrained model state. If you wish to load your own pretrained model state instead, then use the *load_pretrained_model_from_dump* function instead.
+
     
 License
 =======
