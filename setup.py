@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = 'protein-bert',
-    version = '1.0.0',
+    version = '1.0.1',
     description = 'A BERT-like deep language model for protein sequences.',
     url = 'https://github.com/nadavbra/protein_bert',
     author = 'Nadav Brandes',
@@ -17,6 +17,7 @@ setup(
     ],
     install_requires = [
         'tensorflow',
+        'tensorflow_addons',
         'numpy',
         'pandas',
         'h5py',
