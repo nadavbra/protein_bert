@@ -1,13 +1,12 @@
 What is ProteinBERT?
 =============
 
-ProteinBERT is a universal protein language model pretrained on ~106M proteins from the UniRef90 dataset. Through its Python API, the pretrained model can be fine-tuned on any protein-related task in a matter of minutes. Based on our experiments with a wide range of benchmarks, ProteinBERT usually achieves state-of-the-art performance. ProteinBERT is built on TenforFlow/Keras.
+ProteinBERT is a protein language model pretrained on ~106M proteins from UniRef90. The pretrained model can be fine-tuned on any protein-related task in a matter of minutes. ProteinBERT achieves state-of-the-art performance on a wide range of benchmarks. ProteinBERT is built on TenforFlow/Keras.
 
 ProteinBERT's deep-learning architecture is inspired by BERT, but it contains several innovations such as its global-attention layers that grow only lineraly with sequence length (compared to self-attention's quadratic growth). As a result, the model can process protein sequences of almost any length, includng extremely long protein sequences (of over tens of thousands of amino acids).
 
 The model takes protein sequences as inputs, and can also take protein GO annotations as additional inputs (to help the model infer about the function of the input protein and update its internal representations and outputs accordingly).
-This package provides seamless access to a pretrained state that has been produced by training the model for 28 days over ~670M records (i.e. ~6.4 iterations over the entire training dataset of ~106M records). For users interested in pretraining the model from scratch, the package also includes scripts for that.
-
+This package provides  access to a pretrained model produced by training the model for 28 days over ~670M records (i.e. ~6.4 iterations over the entire training dataset of ~106M records). For users interested in pretraining the model from scratch, the package also includes scripts for that.
 
 Installation
 =============
@@ -31,7 +30,7 @@ Below are the Python packages required by ProteinBERT, which are automatically i
 Install ProteinBERT
 ------------
 
-Just run:
+Run:
 
 .. code-block:: sh
 
@@ -47,13 +46,13 @@ Alternatively, clone this repository and run:
 Using ProteinBERT
 =============
 
-Fine-tuning ProteinBERT is very easy. You can see some working examples `in this notebook <https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb>`_.
+Fine-tuning ProteinBERT is very easy. You can see working examples `in this notebook <https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb>`_.
     
     
 Pretraining ProteinBERT from scratch
 =============
 
-If, instead of using the existing pretrained model weights, you would like to train it from scratch, then follow the steps below. We warn you however that this is a long process (we pretrained the current model for a whole month), and it also requires a lot of storage (>1TB).
+If, instead of using the existing model weights, you would like to train from scratch, then follow the steps below. We warn that this is a long process (we pretrained the current model for a whole month), and it also requires a lot of storage (>1TB).
 
 Step 1: Create the UniRef dataset
 ------------
@@ -128,7 +127,10 @@ Step 3: Use your pretrained model state when fine-tuning ProteinBERT
 
 Normally the function *load_pretrained_model* is used to load the existing pretrained model state. If you wish to load your own pretrained model state instead, then use the *load_pretrained_model_from_dump* function instead.
 
-    
+Other implementations:
+=======
+An unofficial PyTorch implementation is also available: https://github.com/lucidrains/protein-bert-pytorch
+
 License
 =======
 ProteinBERT is a free open-source project available under the `MIT License <https://en.wikipedia.org/wiki/MIT_License>`_.
@@ -137,4 +139,7 @@ ProteinBERT is a free open-source project available under the `MIT License <http
 Cite us
 =======
 
-If you use ProteinBERT as part of a work contributing to a scientific publication, we ask that you cite our paper: Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. ProteinBERT: A universal deep-learning model of protein sequence and function. bioRxiv (2021). https://doi.org/10.1101/2021.05.24.445464
+If you use ProteinBERT as part of a work contributing to a scientific publication, we ask that you cite our paper:
+    Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. ProteinBERT: A universal deep-learning model of protein sequence and function. bioRxiv (2021). https://doi.org/10.1101/2021.05.24.445464
+    
+    
