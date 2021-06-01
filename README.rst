@@ -127,6 +127,14 @@ Step 3: Use your pretrained model state when fine-tuning ProteinBERT
 
 Normally the function *load_pretrained_model* is used to load the existing pretrained model state. If you wish to load your own pretrained model state instead, then use the *load_pretrained_model_from_dump* function instead.
 
+Downloading the supervised benchmarks
+=======
+You can download the evaluation benchmarks used with the following command:
+
+.. code-block:: sh
+
+    wget ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/protein_benchmarks/*
+    
 Other implementations:
 =======
 An unofficial PyTorch implementation is also available: https://github.com/lucidrains/protein-bert-pytorch
