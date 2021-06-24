@@ -1,9 +1,9 @@
 What is ProteinBERT?
 =============
 
-ProteinBERT is a protein language model pretrained on ~106M proteins from UniRef90. The pretrained model can be fine-tuned on any protein-related task in a matter of minutes. ProteinBERT achieves state-of-the-art performance on a wide range of benchmarks. ProteinBERT is built on TenforFlow/Keras.
+ProteinBERT is a protein language model pretrained on ~106M proteins from UniRef90. The pretrained model can be fine-tuned on any protein-related task in a matter of minutes. ProteinBERT achieves state-of-the-art performance on a wide range of benchmarks. ProteinBERT is built on Keras/TensorFlow.
 
-ProteinBERT's deep-learning architecture is inspired by BERT, but it contains several innovations such as its global-attention layers that grow only lineraly with sequence length (compared to self-attention's quadratic growth). As a result, the model can process protein sequences of almost any length, includng extremely long protein sequences (of over tens of thousands of amino acids).
+ProteinBERT's deep-learning architecture is inspired by BERT, but contains several innovations such as  global-attention layers that have linear complexity for sequence length (compared to self-attention's quadratic/n^2 growth). As a result, the model can process protein sequences of almost any length, including extremely long protein sequences (of over tens of thousands of amino acids).
 
 The model takes protein sequences as inputs, and can also take protein GO annotations as additional inputs (to help the model infer about the function of the input protein and update its internal representations and outputs accordingly).
 This package provides  access to a pretrained model produced by training the model for 28 days over ~670M records (i.e. ~6.4 iterations over the entire training dataset of ~106M records). For users interested in pretraining the model from scratch, the package also includes scripts for that.
@@ -46,7 +46,9 @@ Alternatively, clone this repository and run:
 Using ProteinBERT
 =============
 
-Fine-tuning ProteinBERT is very easy. You can see working examples `in this notebook <https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb>`_.
+Fine-tuning ProteinBERT is easy. You can see working examples `in this notebook <https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb>`_.
+
+You can download the pretrained model & weights from: 'ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/epoch_92400_sample_23500000.pkl'
     
     
 Pretraining ProteinBERT from scratch
