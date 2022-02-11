@@ -150,6 +150,6 @@ Cite us
 =======
 
 If you use ProteinBERT as part of a work contributing to a scientific publication, we ask that you cite our paper:
-    Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. ProteinBERT: A universal deep-learning model of protein sequence and function. bioRxiv (2021). https://doi.org/10.1101/2021.05.24.445464
+    Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. ProteinBERT: A universal deep-learning model of protein sequence and function. Bioinformatics (2022). https://doi.org/10.1093/bioinformatics/btac020
     
     
