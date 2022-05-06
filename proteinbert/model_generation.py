@@ -73,7 +73,7 @@ class PretrainingModelGenerator(ModelGenerator):
         model = self.create_model_function(seq_len, n_tokens, self.n_annotations, **self.create_model_kwargs)
         
         if compile:
-            model.compile(optimizer = self.optimizer_class(lr = self.lr, **self.other_optimizer_kwargs), loss = ['sparse_categorical_crossentropy', 'binary_crossentropy'], \
+            model.compile(optimizer =self.optimizer_class(learning_rate = self.lr, **self.other_optimizer_kwargs), loss = ['sparse_categorical_crossentropy', 'binary_crossentropy'], \
                     loss_weights = [1, self.annots_loss_weight])
         
         if init_weights:
@@ -135,7 +135,7 @@ class FinetuningModelGenerator(ModelGenerator):
             raise ValueError('Unexpected global output type: %s' % self.output_spec.output_type)
                 
         model = keras.models.Model(inputs = model_inputs, outputs = output_layer)
-        model.compile(loss = loss, optimizer = self.optimizer_class(lr = self.lr, **self.other_optimizer_kwargs))
+        model.compile(loss = loss, optimizer =self.optimizer_class(learning_rate = self.lr, **self.other_optimizer_kwargs))
         
         self._init_weights(model)
                 
