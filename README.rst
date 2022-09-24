@@ -145,11 +145,26 @@ License
 =======
 ProteinBERT is a free open-source project available under the `MIT License <https://en.wikipedia.org/wiki/MIT_License>`_.
  
-   
-Cite us
+## Citation <a name="citations"></a>
 =======
+If you use ProteinBERT, we ask that you cite our paper:
+```    Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. ProteinBERT: A universal deep-learning model of protein sequence and function. Bioinformatics (2022). https://doi.org/10.1093/bioinformatics/btac020
+```
 
-If you use ProteinBERT as part of a work contributing to a scientific publication, we ask that you cite our paper:
-    Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. ProteinBERT: A universal deep-learning model of protein sequence and function. Bioinformatics (2022). https://doi.org/10.1093/bioinformatics/btac020
-    
-    
+```bibtex
+@article{10.1093/bioinformatics/btac020,
+    author = {Brandes, Nadav and Ofer, Dan and Peleg, Yam and Rappoport, Nadav and Linial, Michal},
+    title = "{ProteinBERT: a universal deep-learning model of protein sequence and function}",
+    journal = {Bioinformatics},
+    volume = {38},
+    number = {8},
+    pages = {2102-2110},
+    year = {2022},
+    month = {02},
+    abstract = "{Self-supervised deep language modeling has shown unprecedented success across natural language tasks, and has recently been repurposed to biological sequences. However, existing models and pretraining methods are designed and optimized for text analysis. We introduce ProteinBERT, a deep language model specifically designed for proteins. Our pretraining scheme combines language modeling with a novel task of Gene Ontology (GO) annotation prediction. We introduce novel architectural elements that make the model highly efficient and flexible to long sequences. The architecture of ProteinBERT consists of both local and global representations, allowing end-to-end processing of these types of inputs and outputs. ProteinBERT obtains near state-of-the-art performance, and sometimes exceeds it, on multiple benchmarks covering diverse protein properties (including protein structure, post-translational modifications and biophysical attributes), despite using a far smaller and faster model than competing deep-learning methods. Overall, ProteinBERT provides an efficient framework for rapidly training protein predictors, even with limited labeled data.Code and pretrained model weights are available at https://github.com/nadavbra/protein\_bert.Supplementary data are available at Bioinformatics online.}",
+    issn = {1367-4803},
+    doi = {10.1093/bioinformatics/btac020},
+    url = {https://doi.org/10.1093/bioinformatics/btac020},
+    eprint = {https://academic.oup.com/bioinformatics/article-pdf/38/8/2102/45474534/btac020.pdf},
+}
+```
