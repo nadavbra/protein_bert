@@ -148,7 +148,10 @@ ProteinBERT is a free open-source project available under the `MIT License <http
 ## Citation <a name="citations"></a>
 =======
 If you use ProteinBERT, we ask that you cite our paper:
-```    Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. ProteinBERT: A universal deep-learning model of protein sequence and function. Bioinformatics (2022). https://doi.org/10.1093/bioinformatics/btac020
+``` 
+Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. 
+ProteinBERT: A universal deep-learning model of protein sequence and function. 
+Bioinformatics (2022). https://doi.org/10.1093/bioinformatics/btac020
 ```
 
 ```bibtex
