@@ -29,7 +29,7 @@ def load_pretrained_model(local_model_dump_dir = DEFAULT_LOCAL_MODEL_DUMP_DIR, l
             
             while True:
                 
-                user_input = input('Do you approve downloadig the file into the specified directory? Please specify "Yes" or "No":')
+                user_input = input('Do you approve downloading the file into the specified directory? Please specify "Yes" or "No":')
                 
                 if user_input.lower() in {'yes', 'y'}:
                     break
