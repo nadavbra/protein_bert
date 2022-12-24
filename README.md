@@ -46,7 +46,7 @@ Alternatively, clone this repository and run:
 Using ProteinBERT
 =============
 
-Fine-tuning ProteinBERT is easy. You can see working examples `in this notebook <https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb>`_.
+Fine-tuning ProteinBERT is easy. You can see working examples [in this notebook] (https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb).
 
 You can download the pretrained model & weights from: 'ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/epoch_92400_sample_23500000.pkl'
     
