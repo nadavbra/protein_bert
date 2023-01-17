@@ -39,6 +39,8 @@ pip install protein-bert
 Alternatively, clone this repository and run:
 
 ```sh
+git submodule init
+git submodule update
 python setup.py install
 ```
     
