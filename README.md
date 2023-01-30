@@ -39,6 +39,8 @@ pip install protein-bert
 Alternatively, clone this repository and run:
 
 ```sh
+git submodule init
+git submodule update
 python setup.py install
 ```
     
@@ -48,7 +50,7 @@ Using ProteinBERT
 
 Fine-tuning ProteinBERT is easy. You can see working examples [in this notebook](https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb).
 
-You can download the pretrained model & weights by: 'wget ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/epoch_92400_sample_23500000.pkl'
+You can download the pretrained model & weights by: `wget ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/epoch_92400_sample_23500000.pkl`
     
     
 Pretraining ProteinBERT from scratch
