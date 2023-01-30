@@ -7,6 +7,7 @@ from tensorflow import keras
 
 from .shared_utils.util import log
 from .tokenization import additional_token_to_index, n_tokens, tokenize_seq
+from pdb import set_trace as bp
     
 class ModelGenerator:
 
@@ -31,8 +32,9 @@ class ModelGenerator:
         self.update_state(model)
         
     def update_state(self, model):
-        self.model_weights = copy_weights(model.get_weights())
-        self.optimizer_weights = copy_weights(model.optimizer.get_weights())
+        #self.model_weights = copy_weights(model.variables) # self.weights[0].numpy()
+        self.model_weights = copy_weights([w.numpy() for w in model.variables])
+        self.optimizer_weights = copy_weights([w.numpy() for w in model.optimizer.variables()])
         
     def _init_weights(self, model):
     
@@ -45,7 +47,7 @@ class ModelGenerator:
             model.set_weights(copy_weights(self.model_weights))
         
         if self.optimizer_weights is not None:
-            if len(self.optimizer_weights) == len(model.optimizer.get_weights()):
+            if len(self.optimizer_weights) == len(model.optimizer.variables()):
                 model.optimizer.set_weights(copy_weights(self.optimizer_weights))
             else:
                 log('Incompatible number of optimizer weights - will not initialize them.')
