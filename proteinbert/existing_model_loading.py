@@ -37,6 +37,8 @@ def load_pretrained_model(local_model_dump_dir = DEFAULT_LOCAL_MODEL_DUMP_DIR, l
                     raise ValueError('User wished to cancel.')
         
         downloaded_file_name = os.path.basename(urlparse(remote_model_dump_url).path)
+        if not os.path.exists(local_model_dump_dir):
+            os.mkdir(local_model_dump_dir)
         downloaded_file_path = os.path.join(local_model_dump_dir, downloaded_file_name)
         assert not os.path.exists(downloaded_file_path), 'Cannot download into an already existing file: %s' % downloaded_file_path
         
