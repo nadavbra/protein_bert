@@ -24,7 +24,7 @@ local_representations, global_representations = model.predict(encoded_x, batch_s
 # ... use these as features for other tasks, based on local_representations, global_representations
 ```
 Have a look at the notebook used to finetune the model on a large set of diverse tasks and benchmarks for more usage examples:
-[ProteinBERT - final paper analyses](https://github.com/nadavbra/protein_bert/blob/master/bin/ProteinBERT%20-%20final%20paper%20analyses.ipynb).
+[ProteinBERT demo]([https://github.com/nadavbra/protein_bert/blob/master/bin/ProteinBERT%20-%20final%20paper%20analyses.ipynb](https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb)).
 
 Installation
 =============
