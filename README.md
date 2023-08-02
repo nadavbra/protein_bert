@@ -48,13 +48,7 @@ Below are the Python packages required by ProteinBERT, which are automatically i
 Install ProteinBERT
 ------------
 
-Run:
-
-```sh
-pip install protein-bert
-```
-    
-Alternatively, clone this repository and run:
+Clone this repository and run:
 
 ```sh
 git submodule init
