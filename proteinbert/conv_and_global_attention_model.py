@@ -94,10 +94,10 @@ def create_model(seq_len, vocab_size, n_annotations, d_hidden_seq = 128, d_hidde
     d_value = d_hidden_global // n_heads
     
     input_seq = keras.layers.Input(shape = (seq_len,), dtype = np.int32, name = 'input-seq')
-    input_annoatations = keras.layers.Input(shape = (n_annotations,), dtype = np.float32, name = 'input-annotations')
+    input_annotations = keras.layers.Input(shape = (n_annotations,), dtype = np.float32, name = 'input-annotations')
     
     hidden_seq = keras.layers.Embedding(vocab_size, d_hidden_seq, name = 'embedding-seq-input')(input_seq)
-    hidden_global = keras.layers.Dense(d_hidden_global, activation = activation, name = 'dense-global-input')(input_annoatations)
+    hidden_global = keras.layers.Dense(d_hidden_global, activation = activation, name = 'dense-global-input')(input_annotations)
     
     for block_index in range(1, n_blocks + 1):
         
@@ -129,7 +129,7 @@ def create_model(seq_len, vocab_size, n_annotations, d_hidden_seq = 128, d_hidde
     output_seq = keras.layers.Dense(vocab_size, activation = 'softmax', name = 'output-seq')(hidden_seq)
     output_annotations = keras.layers.Dense(n_annotations, activation = 'sigmoid', name = 'output-annotations')(hidden_global)
 
-    return keras.models.Model(inputs = [input_seq, input_annoatations], outputs = [output_seq, output_annotations])
+    return keras.models.Model(inputs = [input_seq, input_annotations], outputs = [output_seq, output_annotations])
     
 def get_model_with_hidden_layers_as_outputs(model):
     
@@ -138,7 +138,7 @@ def get_model_with_hidden_layers_as_outputs(model):
     seq_layers = [layer.output for layer in model.layers if len(layer.output.shape) == 3 and \
             tuple(layer.output.shape)[:2] == (None, seq_len) and (layer.name in ['input-seq-encoding', 'dense-seq-input', 'output-seq'] or \
             isinstance(layer, keras.layers.LayerNormalization))]
-    global_layers = [layer.output for layer in model.layers if len(layer.output.shape) == 2 and (layer.name in ['input_annoatations', \
+    global_layers = [layer.output for layer in model.layers if len(layer.output.shape) == 2 and (layer.name in ['input_annotations', \
             'dense-global-input', 'output-annotations'] or isinstance(layer, keras.layers.LayerNormalization))]
     
     concatenated_seq_output = keras.layers.Concatenate(name = 'all-seq-layers')(seq_layers)
