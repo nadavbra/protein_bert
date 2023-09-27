@@ -89,9 +89,9 @@ class ModelTrainer:
             self.model_generator.update_state(self.model)
             self.model = self.model_generator.create_model(episode.seq_len)
         
-        X, Y, sample_weigths = self.epoch_generator.create_next_epoch()
+        X, Y, sample_weights = self.epoch_generator.create_next_epoch()
         log('Epoch %d (current sample %d):' % (self.current_epoch_index, self.epoch_generator.current_sample_index))
-        self.model.fit(X, Y, sample_weight = sample_weigths, batch_size = episode.batch_size, callbacks = self.fit_callbacks)
+        self.model.fit(X, Y, sample_weight = sample_weights, batch_size = episode.batch_size, callbacks = self.fit_callbacks)
         
         if autosave and self.autosave_manager is not None:
             self.autosave_manager.on_epoch_end(self.model, self.current_epoch_index, self.epoch_generator.current_sample_index)
