@@ -26,6 +26,7 @@ local_representations, global_representations = model.predict(encoded_x, batch_s
 Have a look at the notebook used to finetune the model on a large set of diverse tasks and benchmarks for more usage examples:
 [ProteinBERT demo](https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb).
 
+You can also download  directly from Huggingface as a Keras model: https://huggingface.co/GrimSqueaker/proteinBERT
 
 
 Installation
@@ -65,7 +66,7 @@ Fine-tuning ProteinBERT is easy. You can see working examples [in this notebook]
 
 You can download the pretrained model & weights by: `wget ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/epoch_92400_sample_23500000.pkl`
 
-The model is also available on Huggingface: `https://huggingface.co/GrimSqueaker/proteinBERT`
+The model is also available on Huggingface: https://huggingface.co/GrimSqueaker/proteinBERT
     
 Pretraining ProteinBERT from scratch
 =============
@@ -162,6 +163,7 @@ ProteinBERT is a free open-source project available under the `MIT License <http
  
 ## Citation <a name="citations"></a>
 =======
+
 If you use ProteinBERT, we ask that you cite our paper:
 ``` 
 Brandes, N., Ofer, D., Peleg, Y., Rappoport, N. & Linial, M. 
