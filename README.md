@@ -26,6 +26,8 @@ local_representations, global_representations = model.predict(encoded_x, batch_s
 Have a look at the notebook used to finetune the model on a large set of diverse tasks and benchmarks for more usage examples:
 [ProteinBERT demo](https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb).
 
+
+
 Installation
 =============
 
@@ -54,8 +56,7 @@ Clone this repository and run:
 git submodule init
 git submodule update
 python setup.py install
-```
-    
+```    
     
 Using ProteinBERT
 =============
@@ -63,7 +64,8 @@ Using ProteinBERT
 Fine-tuning ProteinBERT is easy. You can see working examples [in this notebook](https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb).
 
 You can download the pretrained model & weights by: `wget ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/epoch_92400_sample_23500000.pkl`
-    
+
+The model is also available on Huggingface: `https://huggingface.co/GrimSqueaker/proteinBERT`
     
 Pretraining ProteinBERT from scratch
 =============
