@@ -64,8 +64,7 @@ Using ProteinBERT
 
 Fine-tuning ProteinBERT is easy. You can see working examples [in this notebook](https://github.com/nadavbra/protein_bert/blob/master/ProteinBERT%20demo.ipynb).
 
-You can download the pretrained model & weights on Zenodo: https://zenodo.org/records/10371965
-Or:  `wget ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/epoch_92400_sample_23500000.pkl`.
+You can download the pretrained model & weights from Zenodo at https://zenodo.org/records/10371965 or from GitHub at https://github.com/nadavbra/proteinbert_data_files/blob/master/epoch_92400_sample_23500000.pkl
 
 The model is also available on Huggingface: https://huggingface.co/GrimSqueaker/proteinBERT
     
@@ -148,11 +147,7 @@ Normally the function *load_pretrained_model* is used to load the existing pretr
 
 Downloading the supervised benchmarks
 =======
-You can download the evaluation benchmarks used with the following command:
-
-```sh
-wget ftp://ftp.cs.huji.ac.il/users/nadavb/protein_bert/protein_benchmarks/*
-```
+You can download the evaluation benchmarks from https://github.com/nadavbra/proteinbert_data_files/tree/master/protein_benchmarks.
     
 Other implementations:
 =======
