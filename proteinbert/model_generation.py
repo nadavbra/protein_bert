@@ -129,7 +129,7 @@ class FinetuningModelGenerator(ModelGenerator):
             output_layer = keras.layers.Dense(1, activation = 'sigmoid')(last_hidden_layer)
             loss = 'binary_crossentropy'
         elif self.output_spec.output_type.is_numeric:
-            output_layer = keras.layers.Dense(1, activation = None)(last_hidden_layer)
+            output_layer = keras.layers.Dense(self.output_spec.n_targets, activation = None)(last_hidden_layer)
             loss = 'mse'
         else:
             raise ValueError('Unexpected global output type: %s' % self.output_spec.output_type)
