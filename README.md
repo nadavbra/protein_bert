@@ -148,10 +148,14 @@ Normally the function *load_pretrained_model* is used to load the existing pretr
 Downloading the supervised benchmarks
 =======
 You can download the evaluation benchmarks from https://github.com/nadavbra/proteinbert_data_files/tree/master/protein_benchmarks.
-    
+
+The Neuropeptide precursors (from NeuroPID), and Signal Peptide tasks are also on huggingface datasets:
+- https://huggingface.co/datasets/GrimSqueaker/ProFET_NP_SP_Cleaved
+- https://huggingface.co/datasets/GrimSqueaker/SignalP_Binary
+
 Other implementations:
 =======
-An unofficial PyTorch implementation is also available: https://github.com/lucidrains/protein-bert-pytorch
+An unofficial PyTorch implementation is available: https://github.com/lucidrains/protein-bert-pytorch
 
 License
 =======
