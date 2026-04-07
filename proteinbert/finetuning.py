@@ -21,10 +21,11 @@ class OutputType:
             
 class OutputSpec:
 
-    def __init__(self, output_type, unique_labels = None):
+    def __init__(self, output_type, unique_labels = None, n_targets = 1):
         
         if output_type.is_numeric:
             assert unique_labels is None
+            assert n_targets >= 1, 'n_targets must be at least 1'
         elif output_type.is_binary:
             if unique_labels is None:
                 unique_labels = [0, 1]
@@ -37,6 +38,7 @@ class OutputSpec:
         
         self.output_type = output_type
         self.unique_labels = unique_labels
+        self.n_targets = n_targets
         
         if unique_labels is not None:
             self.n_unique_labels = len(unique_labels)
@@ -177,13 +179,50 @@ def encode_dataset(seqs, raw_Y, input_encoder, output_spec, seq_len = 512, needs
 
 def encode_Y(raw_Y, output_spec, seq_len = 512):
     if output_spec.output_type.is_seq:
-        return encode_seq_Y(raw_Y, seq_len, output_spec.output_type.is_binary, output_spec.unique_labels)
+        if output_spec.output_type.is_numeric:
+            return encode_seq_numeric_Y(raw_Y, seq_len, output_spec.n_targets)
+        else:
+            return encode_seq_Y(raw_Y, seq_len, output_spec.output_type.is_binary, output_spec.unique_labels)
     elif output_spec.output_type.is_categorical:
         return encode_categorical_Y(raw_Y, output_spec.unique_labels), np.ones(len(raw_Y))
     elif output_spec.output_type.is_numeric or output_spec.output_type.is_binary:
+        # n_targets > 1: each element of raw_Y is an array; stack into 2-D.
+        # n_targets == 1: raw_Y contains scalars; keep as 1-D for backward compatibility.
+        if output_spec.n_targets > 1:
+            return np.stack(raw_Y.values).astype(float), np.ones(len(raw_Y))
         return raw_Y.values.astype(float), np.ones(len(raw_Y))
     else:
         raise ValueError('Unexpected output type: %s' % output_spec.output_type)
+
+def encode_seq_numeric_Y(seqs_of_values, seq_len, n_targets):
+    '''
+    Encode per-position numeric regression targets for sequence-level predictions.
+
+    Each element in seqs_of_values should be an array-like of shape
+    (n_positions, n_targets), where n_positions is the number of residues
+    (excluding padding). The encoded arrays use an offset of +1 to leave room
+    for the <START> token that is prepended during tokenisation.
+
+    Returns:
+        Y              - float array of shape (n_seqs, seq_len, n_targets)
+        sample_weights - float array of shape (n_seqs, seq_len), 1 at valid
+                         (non-padding) positions and 0 elsewhere. This shape
+                         matches the (batch, seq_len) loss tensor that Keras
+                         produces after averaging MSE across the n_targets
+                         dimension.
+    '''
+
+    Y = np.zeros((len(seqs_of_values), seq_len, n_targets), dtype = float)
+    sample_weights = np.zeros((len(seqs_of_values), seq_len))
+
+    for i, values in enumerate(seqs_of_values):
+        values = np.array(values, dtype = float)  # shape: (n_positions, n_targets)
+        n_pos = len(values)
+        # +1 to account for the <START> token at the beginning
+        Y[i, 1:n_pos + 1, :] = values
+        sample_weights[i, 1:n_pos + 1] = 1
+
+    return Y, sample_weights
 
 def encode_seq_Y(seqs, seq_len, is_binary, unique_labels):
 
